@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Digital Dash Display with Simulations</title>
+<style>
+  @font-face {
+    font-family: 'Lexend';
+    src: url('Lexend-VariableFont_wght.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+  }
+  body {
+    background-color: black;
+    color: white;
+    font-family: 'Lexend', sans-serif;
+    text-align: center;
+  }
+  .imageContainer {
+    position: relative;
+    display: inline-block;
+    max-width: 600px;
+  }
+  .imageContainer img {
+    width: 100%;
+    height: auto;
+  }
+  .overlayText, .overlayGear, .overlayRPM {
+    position: absolute;
+    font-size: 0.75em; /*adjusted for visibility */
+    color: white; /* Adjust as needed */
+  }
+  .overlayGear {
+    font-size: 9em; /* Adjusted for visibility */
+  }
+  .overlayRPM {
+    font-size: 1em; /* Adjusted for visibility */
+    color: black; /* Changed to white for consistency */
+  }
+  #rpmOverlay { top: 72%; left: 40%; }
+  #gearOverlay { top: 25%; left: 50%; }
+  #speedOverlay { top: 55%; left:70%; }
+  #oilTempOverlay { top: 35%; left: 70%; }
+  #waterTempOverlay { top: 45%; left: 70%; }
+  #voltOverlay { top: 35%; left: 22%; }
+  #drsOverlay { top: 55%; left: 22%; }
+  #comOverlay { top: 45%; left: 22%; }
+</style>
+</head>
+<body>
+
+<div class="imageContainer">
+  <img src="your-default-image.jpg" alt="Default Image" id="dashImage">
+  <div id="drsOverlay" class="overlayText">BOOT<BR>NULL</div>
+  <div id="rpmOverlay" class="overlayRPM">BOOT: NULL</div>
+  <div id="gearOverlay" class="overlayGear">N</div>
+  <div id="speedOverlay" class="overlayText">BOOT<br>NULL</div>
+  <div id="oilTempOverlay" class="overlayText">BOOT<br>NULL</div>
+  <div id="waterTempOverlay" class="overlayText">BOOT<BR>NULL</div>
+  <div id="voltOverlay" class="overlayText">BOOT<BR>NULL</div>
+  <div id="comOverlay" class="overlayText">BOOT<BR>NULL</div>
+</div>
+
+<script>
+    // Assuming this is corrected and images exist at the specified paths
+    const rpmConfigurations = [
+      { limit: 1000, src: 'RPM_Idle_Clear.png', text: 'Idle' },
+      { limit: 1500, src: 'RPM_1_Clear.png', text: '1' },
+      { limit: 3000, src: 'RPM_2_Clear.png', text: '1' },
+      { limit: 4500, src: 'RPM_3_Clear.png', text: '1' },
+      { limit: 6000, src: 'RPM_Max_Clear.png', text: '1' },
+      { limit: Infinity, src: 'RPM_OverMax_Clear.png', text: '1' },
+    ];
+  
+    let rpm = 0; // Initial RPM value
+  
+    function updateDisplay() {
+      rpm += 10; // Increment RPM for simulation
+      if (rpm >= 7000) rpm = 0; // Reset RPM for simulation
+      const configuration = rpmConfigurations.find(config => rpm <= config.limit);
+      document.getElementById('dashImage').src = configuration.src;
+      document.getElementById('rpmOverlay').innerText = `RPM: ${rpm}`;
+      setTimeout(updateDisplay, 10); // Continue updating
+    }
+  
+    function simulateGearChange() {
+      let gear = 0; // Start with 0 to represent neutral gear initially
+      const maxGear = 6; // Assuming a 6-speed transmission
+      function incrementGear() {
+        gear = gear < maxGear ? gear + 1 : 0; // Cycle gears
+  
+        // Update gear indicator text
+        const gearText = gear === 0 ? 'N' : gear.toString();
+        document.getElementById('gearOverlay').innerText = gearText;
+  
+        // Adjust position for 'N' only
+        if (gear === 0) {
+          document.getElementById('gearOverlay').style.left = "35%"; // Adjust this value as needed
+        } else {
+          document.getElementById('gearOverlay').style.left = "39%"; // Original position
+        }
+  
+        setTimeout(incrementGear, 250); // Change gear every 0.25 seconds
+      }
+      incrementGear();
+    }
+  
+    function simulateSpeed() {
+      let speed = 0;
+      const maxSpeed = 120; // Maximum speed for simulation
+      setInterval(() => {
+        speed = (speed + 5) % (maxSpeed + 1);
+        document.getElementById('speedOverlay').innerText = `MPH:\n${speed}`;
+      }, 1000);
+    }
+  
+    function simulateOilTemp() {
+      let oilTemp = 100;
+      setInterval(() => {
+        oilTemp = oilTemp >= 220 ? 100 : oilTemp + 5;
+        document.getElementById('oilTempOverlay').innerText = `OIL:\n${oilTemp}°`;
+      }, 2000);
+    }
+  
+    function simulateWaterTemp() {
+      let waterTemp = 85;
+      setInterval(() => {
+        waterTemp = waterTemp >= 180 ? 85 : waterTemp + 2;
+        document.getElementById('waterTempOverlay').innerText = `WTR:\n${waterTemp}°F`;
+      }, 1500);
+    }
+  
+    function simulateVolts() {
+      let volts = 12;
+      setInterval(() => {
+        volts = volts >= 14 ? 12 : volts + 0.1;
+        document.getElementById('voltOverlay').innerText = `VOLT:\n${volts.toFixed(1)}V`;
+      }, 1000);
+    }
+  
+    function simulateDRS() {
+      let drsOn = false; // Initial DRS status
+  
+      setInterval(() => {
+        drsOn = !drsOn; // Toggle DRS status
+        document.getElementById('drsOverlay').innerText = `DRS:\n${drsOn ? 'ON' : 'OFF'}`;
+      }, 3000); // Change DRS status every 3 seconds
+    }
+
+    function simulateCOM() {
+      let comOn = false; // Initial COM status
+  
+      setInterval(() => {
+        comOn = !comOn; // Toggle COM status
+        document.getElementById('comOverlay').innerText = `COM:\n${comOn ? 'ON' : 'OFF'}`;
+      }, 3000); // Change COM status every 3 seconds
+    }
+  
+    // Start the simulations when the document is fully loaded
+    window.onload = function() {
+      updateDisplay();
+      simulateGearChange();
+      simulateSpeed();
+      simulateOilTemp();
+      simulateWaterTemp();
+      simulateVolts();
+      simulateDRS();
+      simulateCOM();
+    };
+  </script>
+  
+
+</body>
+</html>
