@@ -3,12 +3,11 @@ const path = require('path');
 const app = express();
 const port = 3000;
 
-// Serve static files from the 'public' directory
-app.use(express.static('public'));
+// Serve static files directly from the current directory
+app.use(express.static(__dirname));
 
-// Send index.html when the root is accessed
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 // Start the server
