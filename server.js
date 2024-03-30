@@ -1,31 +1,28 @@
-const express = require('express');
 const http = require('http');
-const socketIo = require('socket.io');
+const fs = require('fs');
 const path = require('path');
 
-const app = express();
-const server = http.createServer(app);
-const io = socketIo(server);
+// Create a server
+const server = http.createServer((req, res) => {
+    // Set the content type to HTML
+    res.writeHead(200, {'Content-Type': 'text/html'});
 
-// Serve your static files (html, css, js) from the 'public' directory
-app.use(express.static(path.join(__dirname, 'public')));
-
-// Define route handler for the root URL ("/")
-app.get('/', (req, res) => {
-  // Send the index.html file when the root URL is requested
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
-
-// Socket.IO logic goes here...
-
-// Handle Socket.IO connections
-io.on('connection', (socket) => {
-  console.log('A client has connected');
-  // Additional Socket.IO logic can be added here
+    // Read the index.html file
+    const filePath = path.join(__dirname, 'index.html');
+    fs.readFile(filePath, (err, data) => {
+        if (err) {
+            // If there's an error reading the file, send a 404 response
+            res.writeHead(404);
+            res.end('404 Not Found');
+        } else {
+            // If the file is successfully read, send its contents as the response
+            res.end(data);
+        }
+    });
 });
 
 // Start the server
-const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
-  console.log(`Server listening on port ${PORT}`);
+const port = 3000;
+server.listen(port, () => {
+    console.log(`Server is running on http://localhost:${port}`);
 });
