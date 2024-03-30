@@ -1,28 +1,17 @@
-const http = require('http');
-const fs = require('fs');
+const express = require('express');
 const path = require('path');
+const app = express();
+const port = 3000;
 
-// Create a server
-const server = http.createServer((req, res) => {
-    // Set the content type to HTML
-    res.writeHead(200, {'Content-Type': 'text/html'});
+// Serve static files from the 'public' directory
+app.use(express.static('public'));
 
-    // Read the index.html file
-    const filePath = path.join(__dirname, 'index.html');
-    fs.readFile(filePath, (err, data) => {
-        if (err) {
-            // If there's an error reading the file, send a 404 response
-            res.writeHead(404);
-            res.end('404 Not Found');
-        } else {
-            // If the file is successfully read, send its contents as the response
-            res.end(data);
-        }
-    });
+// Send index.html when the root is accessed
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // Start the server
-const port = 3000;
-server.listen(port, () => {
-    console.log(`Server is running on http://localhost:${port}`);
+app.listen(port, () => {
+  console.log(`Server running on http://localhost:${port}`);
 });
